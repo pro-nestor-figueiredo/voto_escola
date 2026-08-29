@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from .forms import EleicaoForm
 from .models import Aluno, Eleicao, Opcao, Perfil, Voto
 
 
@@ -78,6 +79,22 @@ class VotoEscolaTestes(TestCase):
         self.client.login(username=self.aluno.ra, password=self.aluno.ra)
         self.client.post(reverse('urna'), {'eleicao_id': self.eleicao.id, 'opcao_id': self.op1.id})
         self.assertFalse(Voto.objects.filter(eleicao=self.eleicao, aluno=self.aluno).exists())
+
+    # --- fuso horário ---
+    def test_form_interpreta_horario_como_local(self):
+        """Input datetime-local (sem fuso) deve ser tratado como America/Sao_Paulo."""
+        form = EleicaoForm(data={
+            'titulo': 'Teste fuso',
+            'inicio': '2026-08-29T13:38',
+            'fim': '2026-08-29T17:01',
+            'ativa': True,
+            'publicar_resultados': True,
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        eleicao = form.save()
+        self.assertEqual(timezone.localtime(eleicao.inicio).strftime('%H:%M'), '13:38')
+        self.assertEqual(timezone.localtime(eleicao.fim).strftime('%H:%M'), '17:01')
+        self.assertEqual(eleicao.status, 'agendada')
 
     # --- resultados ---
     def test_resultado_publicado_apos_encerrar(self):

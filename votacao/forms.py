@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from .models import Aluno, Eleicao, Opcao
 
@@ -33,6 +34,11 @@ class EleicaoForm(forms.ModelForm):
         cleaned = super().clean()
         inicio = cleaned.get('inicio')
         fim = cleaned.get('fim')
+        # O input datetime-local envia horário sem fuso → assume horário local (America/Sao_Paulo)
+        for f in ('inicio', 'fim'):
+            v = cleaned.get(f)
+            if v is not None and timezone.is_naive(v):
+                cleaned[f] = timezone.make_aware(v, timezone.get_current_timezone())
         if inicio and fim and fim <= inicio:
             raise forms.ValidationError('O fim da votação deve ser depois do início.')
         return cleaned
