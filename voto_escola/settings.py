@@ -124,6 +124,18 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
+# Multi-apps no mesmo host (192.168.1.21) compartilham cookies por domínio,
+# sem porta. Nomes exclusivos evitam que o csrftoken/sessionid de outra app
+# (cofre, escola, etc.) invalide o CSRF/sessão aqui.
+CSRF_COOKIE_NAME = 'voto_escola_csrftoken'
+SESSION_COOKIE_NAME = 'voto_escola_sessionid'
+CSRF_TRUSTED_ORIGINS = [
+    'http://192.168.1.21:8013',
+    'http://localhost:8013',
+    'http://127.0.0.1:8013',
+    'http://nestorgf.ddns.net:8013',
+]
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
