@@ -1,0 +1,43 @@
+/* VoteEscola — ajustes finos */
+body {
+    background-color: #f5f6fa;
+}
+
+.navbar-brand i {
+    font-size: 1.2rem;
+}
+
+.card {
+    border-radius: .75rem;
+}
+
+.stat-card .icon {
+    width: 52px;
+    height: 52px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.opcao-card {
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    border: 2px solid #dee2e6;
+}
+
+.opcao-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .12);
+    border-color: #0d6efd;
+}
+
+.opcao-card.selected {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+.table-votos th {
+    background-color: #f8f9fa;
+}

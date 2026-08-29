@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Login · VoteEscola{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0 rounded-4 mt-5">
+            <div class="card-body p-4 p-md-5 text-center">
+                <div class="display-1 text-primary mb-3"><i class="bi bi-box2-heart-fill"></i></div>
+                <h1 class="h3 fw-bold mb-1">VoteEscola</h1>
+                <p class="text-muted mb-4">Sistema de Votação Escolar</p>
+
+                {% if form.errors %}
+                <div class="alert alert-danger py-2 small">Usuário ou senha inválidos.</div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="id_username" name="username" placeholder="RA ou usuário" required autofocus>
+                        <label for="id_username"><i class="bi bi-person"></i> RA ou usuário</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="id_password" name="password" placeholder="Senha" required>
+                        <label for="id_password"><i class="bi bi-key"></i> Senha</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar
+                    </button>
+                </form>
+                <p class="text-muted small mt-3 mb-0">
+                    Alunos: use seu <strong>RA</strong> como usuário e senha inicial.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

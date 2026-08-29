@@ -1,1 +1,7 @@
 .vscode/
+escola_db.json
+
+# Django
+__pycache__/
+*.pyc
+staticfiles/

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}{{ eleicao.titulo }} · VoteEscola{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-balloon-heart text-primary"></i> {{ eleicao.titulo }}</h2>
+        <span class="text-muted small">
+            Janela: <strong>{{ eleicao.inicio|date:'d/m/Y H:i' }}</strong> → <strong>{{ eleicao.fim|date:'d/m/Y H:i' }}</strong>
+        </span>
+        <span class="badge {% if eleicao.status == 'aberta' %}text-bg-success{% elif eleicao.status == 'agendada' %}text-bg-warning{% elif eleicao.status == 'suspensa' %}text-bg-danger{% else %}text-bg-secondary{% endif %} ms-2">{{ eleicao.status|upper }}</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'eleicao_editar' eleicao.id %}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i> Editar</a>
+        <a href="{% url 'eleicoes' %}" class="btn btn-outline-secondary">Voltar</a>
+    </div>
+</div>
+
+{% if eleicao.descricao %}<p class="text-muted">{{ eleicao.descricao }}</p>{% endif %}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-list-ol"></i> Opções / Chapas <span class="badge text-bg-primary">{{ opcoes|length }}</span></div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>#</th><th>Nome</th><th class="text-center">Votos</th><th class="text-end">%</th><th></th></tr></thead>
+                    <tbody>
+                        {% for o in opcoes %}
+                        <tr>
+                            <td class="text-muted">{{ o.ordem }}</td>
+                            <td>
+                                <div class="fw-semibold">{{ o.nome }}</div>
+                                {% if o.descricao %}<small class="text-muted">{{ o.descricao }}</small>{% endif %}
+                            </td>
+                            <td class="text-center">{{ o.votos }}</td>
+                            <td class="text-end">{{ o.percentual }}%</td>
+                            <td class="text-end">
+                                <form method="post" action="{% url 'opcao_excluir' eleicao.id o.id %}" onsubmit="return confirm('Excluir esta opção?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-3">Nenhuma opção cadastrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-plus-circle"></i> Adicionar opção</div>
+            <div class="card-body">
+                <form method="post" class="row g-2">
+                    {% csrf_token %}
+                    <div class="col-12 col-md-5">{{ form.nome }}</div>
+                    <div class="col-12 col-md-5">{{ form.descricao }}</div>
+                    <div class="col-12 col-md-2 d-flex gap-2">
+                        {{ form.ordem }}
+                        <button type="submit" class="btn btn-primary flex-shrink-0"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-pie-chart"></i> Apuração atual</div>
+            <div class="card-body">
+                <canvas id="chartDetalhe" height="180"></canvas>
+                <div class="text-center text-muted small mt-2">
+                    {{ total }} voto{{ total|pluralize }} · {{ eleicao.participacao }}% de participação
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('chartDetalhe'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            data: {{ chart_data|safe }},
+            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1', '#fd7e14', '#20c997'],
+            borderWidth: 2,
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

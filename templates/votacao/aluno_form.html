@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo_pagina }} · VoteEscola{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-person-gear"></i> {{ titulo_pagina }}</div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold">RA *</label>
+                            {{ form.ra }}
+                            {% if form.ra.errors %}<div class="text-danger small">{{ form.ra.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <label class="form-label fw-semibold">Nome completo *</label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}<div class="text-danger small">{{ form.nome.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold">Turma</label>
+                            {{ form.turma }}
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold">Série</label>
+                            {{ form.serie }}
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold">Escola</label>
+                            {{ form.escola }}
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mt-3 mb-4">
+                        {{ form.ativo }}
+                        <label class="form-check-label" for="{{ form.ativo.id_for_label }}">Aluno ativo (pode votar)</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+                        <a href="{% url 'alunos' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Meus Votos · VoteEscola{% endblock %}
+{% block content %}
+<h2 class="fw-bold mb-4"><i class="bi bi-receipt text-primary"></i> Meus Votos</h2>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-votos align-middle mb-0">
+            <thead><tr><th>Eleição</th><th>Opção votada</th><th>Data do voto</th></tr></thead>
+            <tbody>
+                {% for v in votos %}
+                <tr>
+                    <td class="fw-semibold">{{ v.eleicao.titulo }}</td>
+                    <td>{{ v.opcao.nome }}</td>
+                    <td>{{ v.criado_em|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted py-4">Você ainda não votou em nenhuma eleição.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

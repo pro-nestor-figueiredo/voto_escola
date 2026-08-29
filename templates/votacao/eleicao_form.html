@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo_pagina }} · VoteEscola{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-gear"></i> {{ titulo_pagina }}</div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tema da votação *</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}<div class="text-danger small">{{ form.titulo.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold"><i class="bi bi-play-circle"></i> Início da votação *</label>
+                            {{ form.inicio }}
+                            {% if form.inicio.errors %}<div class="text-danger small">{{ form.inicio.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold"><i class="bi bi-stop-circle"></i> Fim da votação *</label>
+                            {{ form.fim }}
+                            {% if form.fim.errors %}<div class="text-danger small">{{ form.fim.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mb-2">
+                        {{ form.ativa }}
+                        <label class="form-check-label" for="{{ form.ativa.id_for_label }}">Votação ativa (desative para suspender)</label>
+                    </div>
+                    <div class="form-check form-switch mb-4">
+                        {{ form.publicar_resultados }}
+                        <label class="form-check-label" for="{{ form.publicar_resultados.id_for_label }}">Publicar resultados para os alunos após encerrar</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+                        <a href="{% url 'eleicoes' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

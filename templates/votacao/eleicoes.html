@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Eleições · VoteEscola{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h2 class="fw-bold mb-0"><i class="bi bi-balloon-heart text-primary"></i> Eleições / Votações</h2>
+    <a href="{% url 'eleicao_nova' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova Eleição</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-votos align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tema</th>
+                    <th>Janela de votação</th>
+                    <th>Status</th>
+                    <th class="text-center">Votos</th>
+                    <th class="text-center">Participação</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in eleicoes %}
+                <tr>
+                    <td class="fw-semibold">
+                        <a href="{% url 'eleicao_detalhe' e.id %}" class="text-decoration-none">{{ e.titulo }}</a>
+                        {% if not e.ativa %}<span class="badge text-bg-danger ms-1">SUSPENSA</span>{% endif %}
+                    </td>
+                    <td class="small">
+                        {{ e.inicio|date:'d/m/Y H:i' }}<br>
+                        <span class="text-muted">→ {{ e.fim|date:'d/m/Y H:i' }}</span>
+                    </td>
+                    <td>
+                        {% if e.status == 'aberta' %}<span class="badge text-bg-success">ABERTA</span>
+                        {% elif e.status == 'agendada' %}<span class="badge text-bg-warning">AGENDADA</span>
+                        {% elif e.status == 'suspensa' %}<span class="badge text-bg-danger">SUSPENSA</span>
+                        {% else %}<span class="badge text-bg-secondary">ENCERRADA</span>{% endif %}
+                    </td>
+                    <td class="text-center">{{ e.total_votos }}</td>
+                    <td class="text-center">{{ e.participacao }}%</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'eleicao_detalhe' e.id %}" class="btn btn-sm btn-outline-secondary" title="Detalhes"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'eleicao_editar' e.id %}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{% url 'eleicao_excluir' e.id %}" class="d-inline" onsubmit="return confirm('Excluir a eleição e todos os votos dela?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma eleição cadastrada. <a href="{% url 'eleicao_nova' %}">Crie a primeira</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Alunos · VoteEscola{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h2 class="fw-bold mb-0"><i class="bi bi-people text-primary"></i> Alunos <span class="badge text-bg-secondary">{{ total }}</span></h2>
+    <a href="{% url 'aluno_novo' %}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Novo Aluno</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2">
+            <div class="col-12 col-md-6 col-lg-4">
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nome ou RA...">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Buscar</button>
+                {% if q %}<a href="{% url 'alunos' %}" class="btn btn-outline-secondary">Limpar</a>{% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-votos align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>RA</th>
+                    <th>Nome</th>
+                    <th>Turma</th>
+                    <th>Série</th>
+                    <th>Escola</th>
+                    <th class="text-center">Situação</th>
+                    <th class="text-center">Login</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in alunos %}
+                <tr>
+                    <td class="fw-semibold">{{ a.ra }}</td>
+                    <td>{{ a.nome }}</td>
+                    <td>{{ a.turma|default:'—' }}</td>
+                    <td>{{ a.serie|default:'—' }}</td>
+                    <td>{{ a.escola|default:'—' }}</td>
+                    <td class="text-center">
+                        {% if a.ativo %}<span class="badge text-bg-success">Ativo</span>
+                        {% else %}<span class="badge text-bg-danger">Inativo</span>{% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if a.usuario %}<span class="badge text-bg-info">criado</span>
+                        {% else %}<span class="badge text-bg-light text-muted border">—</span>{% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'aluno_editar' a.id %}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{% url 'aluno_toggle' a.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm {% if a.ativo %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if a.ativo %}Inativar{% else %}Reativar{% endif %}">
+                                <i class="bi {% if a.ativo %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
+                            </button>
+                        </form>
+                        {% if a.usuario %}
+                        <form method="post" action="{% url 'aluno_reset_senha' a.id %}" class="d-inline" onsubmit="return confirm('Resetar a senha de {{ a.nome }} para o RA?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Resetar senha"><i class="bi bi-key"></i></button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="{% url 'aluno_criar_login' a.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Criar login (RA/RA)"><i class="bi bi-person-plus"></i></button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center text-muted py-4">
+                    {% if q %}Nenhum aluno encontrado para "{{ q }}".{% else %}Nenhum aluno cadastrado ainda.{% endif %}
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

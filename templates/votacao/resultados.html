@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Resultados · VoteEscola{% endblock %}
+{% block content %}
+<h2 class="fw-bold mb-4"><i class="bi bi-bar-chart-line text-primary"></i> Resultados</h2>
+
+{% if sem_eleicao %}
+<div class="alert alert-info">Nenhuma eleição cadastrada ainda.</div>
+{% else %}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Eleição</label>
+                <select name="eleicao" class="form-select" onchange="this.form.submit()">
+                    {% for e in eleicoes %}
+                    <option value="{{ e.id }}" {% if e.id == eleicao.id %}selected{% endif %}>{{ e.titulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <span class="badge text-bg-{% if eleicao.status == 'aberta' %}success{% elif eleicao.status == 'agendada' %}warning{% else %}secondary{% endif %} fs-6">
+                    {{ eleicao.status|upper }}
+                </span>
+                <span class="text-muted small ms-2">{{ eleicao.inicio|date:'d/m/Y H:i' }} → {{ eleicao.fim|date:'d/m/Y H:i' }}</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-pie-chart"></i> Apuração</div>
+            <div class="card-body">
+                <canvas id="chartResultado" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-list-ol"></i> Votos por opção</div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-votos mb-0">
+                    <thead><tr><th>Opção</th><th class="text-center">Votos</th><th class="text-end">%</th></tr></thead>
+                    <tbody>
+                        {% for o in opcoes %}
+                        <tr>
+                            <td class="fw-semibold">{{ o.nome }}</td>
+                            <td class="text-center">{{ o.votos }}</td>
+                            <td class="text-end">{{ o.percentual }}%</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">Nenhuma opção cadastrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-light fw-bold">
+                            <td>Total</td>
+                            <td class="text-center">{{ total }}</td>
+                            <td class="text-end">100%</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not sem_eleicao %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const labels = {{ chart_labels|safe }};
+const data = {{ chart_data|safe }};
+new Chart(document.getElementById('chartResultado'), {
+    type: 'doughnut',
+    data: {
+        labels,
+        datasets: [{
+            data,
+            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1', '#fd7e14', '#20c997'],
+            borderWidth: 2,
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endif %}
+{% endblock %}
