@@ -21,6 +21,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--dry-run', action='store_true', help='Apenas mostra o que seria feito.')
+        parser.add_argument('--escola', type=str, default='',
+                            help='Importa apenas alunos desta escola (ex.: "Santa Olimpia").')
 
     def handle(self, *args, **opts):
         cfg_path = Path(__file__).resolve().parent.parent.parent.parent / 'escola_db.json'
@@ -49,6 +51,12 @@ class Command(BaseCommand):
         rows = cur.fetchall()
         cur.close()
         conn.close()
+
+        escola_filtro = opts.get('escola', '').strip()
+        if escola_filtro:
+            antes = len(rows)
+            rows = [r for r in rows if r[3] == escola_filtro]
+            self.stdout.write(f'Filtro por escola "{escola_filtro}": {antes} -> {len(rows)} linhas.')
 
         criados = atualizados = ignorados = 0
         for ra, nome, ativo, escola in rows:
