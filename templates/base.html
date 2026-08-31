@@ -24,7 +24,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'eleicoes' %}"><i class="bi bi-balloon-heart"></i> Eleições</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'resultados' %}"><i class="bi bi-bar-chart-line"></i> Resultados</a></li>
-                    {% if perfil.nivel == 'admin' %}
+                    {% if perfil.nivel == 'admin' or user.is_superuser %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'alunos' %}"><i class="bi bi-people"></i> Alunos</a></li>
                     {% endif %}
                     {% else %}
